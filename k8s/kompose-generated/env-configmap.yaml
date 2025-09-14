@@ -1,0 +1,28 @@
+apiVersion: v1
+data:
+  BACKEND_CORS_ORIGINS: '["http://localhost:3000", "https://localhost:3000", "http://localhost", "https://localhost"]'
+  DOCKER_IMAGE_BACKEND: fastapi-backend
+  DOCKER_IMAGE_FRONTEND: react-frontend
+  DOMAIN: localhost
+  EMAILS_FROM_EMAIL: ""
+  ENVIRONMENT: local
+  FIRST_SUPERUSER: admin@example.com
+  FIRST_SUPERUSER_PASSWORD: changethis
+  FRONTEND_HOST: http://localhost:3000
+  POSTGRES_DB: app
+  POSTGRES_PASSWORD: changethis
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: postgres
+  PROJECT_NAME: Full Stack FastAPI App
+  SECRET_KEY: dev-secret-key-change-in-production
+  SENTRY_DSN: ""
+  SMTP_HOST: ""
+  SMTP_PASSWORD: ""
+  SMTP_USER: ""
+  STACK_NAME: devspace
+  TAG: latest
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: backend-env
+  name: env

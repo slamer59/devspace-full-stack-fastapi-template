@@ -1,0 +1,64 @@
+version: v2beta1
+name: fullstack-app
+
+vars:
+  DOMAIN:
+    default: localhost
+  POSTGRES_PASSWORD:
+    default: changethis
+
+images:
+  backend:
+    image: fastapi-backend
+    dockerfile: ./backend/Dockerfile
+    context: ./backend
+    rebuildStrategy: ignoreContextChanges
+    buildKit: {}
+  frontend:
+    image: react-frontend
+    dockerfile: ./frontend/Dockerfile
+    context: ./frontend
+    rebuildStrategy: ignoreContextChanges
+    buildKit: {}
+
+deployments:
+  fullstack:
+    kubectl:
+      kustomize: true
+      manifests:
+        - k8s/overlays/development/
+
+dev:
+  backend:
+    imageSelector: fastapi-backend
+    terminal:
+      command: fastapi dev --host 0.0.0.0 --port 8000 app/main.py
+      workDir: /app
+    sync:
+      - path: ./backend/app:/app/app
+        excludePaths:
+          - __pycache__/
+          - "*.pyc"
+    ports:
+      - port: "8000"
+
+  frontend:
+    imageSelector: react-frontend
+    sync:
+      - path: ./frontend/src:/app/src
+    ports:
+      - port: "3001:80"
+
+  database:
+    labelSelector:
+      app: fullstack-app
+    ports:
+      - port: "5432"
+
+profiles:
+  - name: backend-only
+    patches:
+      - op: remove
+        path: dev.frontend
+      - op: remove
+        path: deployments.fullstack.kubectl.manifests[3]

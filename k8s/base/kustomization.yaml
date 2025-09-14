@@ -1,0 +1,65 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: fullstack-app-base
+
+resources:
+  # Shared resources
+  - shared/configmap.yaml
+  - shared/secret.yaml
+  - shared/ingress.yaml
+  
+  # Database resources  
+  - database/pvc.yaml
+  - database/deployment.yaml
+  - database/service.yaml
+  - database/db-service.yaml
+  
+  # Backend resources
+  - backend/deployment.yaml
+  - backend/service.yaml
+  
+  # Frontend resources
+  - frontend/deployment.yaml
+  - frontend/service.yaml
+
+commonLabels:
+  app: fullstack-app
+  version: v1.0.0
+
+namespace: default
+
+# Images that will be replaced by DevSpace
+images:
+  - name: fastapi-backend
+    newTag: latest
+  - name: react-frontend  
+    newTag: latest
+
+# ConfigMap generators for environment-specific configs
+configMapGenerator:
+  - name: app-info
+    literals:
+      - VERSION=1.0.0
+      - BUILD_DATE=2024-01-01
+      - GIT_COMMIT=unknown
+
+# Resource transformations
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: fastapi-backend
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backend
+            env:
+            - name: BUILD_INFO
+              valueFrom:
+                configMapKeyRef:
+                  name: app-info
+                  key: VERSION

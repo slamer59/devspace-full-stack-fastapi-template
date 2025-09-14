@@ -1,0 +1,108 @@
+version: v1beta11
+name: fullstack-frontend
+
+# Variables for customization  
+vars:
+- name: API_URL
+  question: What is the API URL?
+  default: http://api.localhost
+- name: DOMAIN
+  question: What is your domain?
+  default: localhost
+
+# Configuration to build images
+images:
+  frontend:
+    image: react-frontend
+    dockerfile: ./frontend/Dockerfile
+    context: ./frontend
+    buildArgs:
+      VITE_API_URL: "http://api.localhost"
+      NODE_ENV: "development"
+      DOCKER_BUILDKIT: "1"
+
+# Deploy full stack for frontend development
+deployments:
+- name: frontend-dev
+  kubectl:
+    manifests:
+      - k8s/base/shared/configmap.yaml
+      - k8s/base/shared/secret.yaml
+      - k8s/base/database/
+      - k8s/base/backend/
+      - k8s/base/frontend/
+
+# Development configuration for frontend
+dev:
+  frontend:
+    imageSelector: react-frontend
+    container: frontend
+    
+    # For React development, use a development server instead of Nginx
+    devImage: node:24
+    
+    # Sync local frontend code with the container
+    sync:
+    - path: ./frontend/src:/app/src
+      excludePaths:
+      - node_modules/
+      - dist/
+      - "*.log"
+    - path: ./frontend/public:/app/public
+    - path: ./frontend/package.json:/app/package.json
+      file: true
+    - path: ./frontend/package-lock.json:/app/package-lock.json
+      file: true
+    - path: ./frontend/vite.config.ts:/app/vite.config.ts
+      file: true
+    - path: ./frontend/tsconfig.json:/app/tsconfig.json
+      file: true
+    - path: ./frontend/index.html:/app/index.html
+      file: true
+
+    # Port forwarding for local development
+    ports:
+    - port: "3000:3000"
+
+    # Override working directory and command for development
+    workingDir: /app
+    command: ["sh", "-c"]
+    args: ["npm install && npm run dev -- --host 0.0.0.0 --port 3000"]
+    
+    # Development environment variables
+    env:
+    - name: VITE_API_URL
+      value: "http://localhost:8000"
+    - name: NODE_ENV
+      value: "development"
+    - name: CHOKIDAR_USEPOLLING
+      value: "true"
+
+    # Terminal access for debugging
+    terminal:
+      enabled: true
+
+    # Initialize development environment
+    postStart:
+      command: ["sh", "-c", "cd /app && npm install"]
+
+# Profiles
+profiles:
+- name: production
+  description: Production environment configuration for frontend
+  patches:
+  - op: replace
+    path: images.frontend.buildArgs.VITE_API_URL
+    value: "https://api.${DOMAIN}"
+  - op: replace
+    path: images.frontend.buildArgs.NODE_ENV
+    value: "production"
+  - op: replace
+    path: dev.frontend.env[0].value
+    value: "https://api.${DOMAIN}"
+
+- name: build-only
+  description: Only build the frontend without development features
+  patches:
+  - op: remove
+    path: dev

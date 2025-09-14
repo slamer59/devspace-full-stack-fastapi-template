@@ -1,0 +1,14 @@
+.devspace/cache-devspace-backend.yaml
+.devspace/cache-devspace-frontend.yaml
+.devspace/cache.yaml
+.devspace/logs/default.log
+.devspace/logs/dev.backend.log
+.devspace/logs/dev.dev:backend.log
+.devspace/logs/dev.dev:database.log
+.devspace/logs/dev.dev:frontend.log
+.devspace/logs/dev.dev:ports-0.log
+.devspace/logs/dev.dev:ports-1.log
+.devspace/logs/dev.frontend.log
+.devspace/logs/errors.log
+.devspace/logs/portforwarding.log
+.devspace/logs/ui.log

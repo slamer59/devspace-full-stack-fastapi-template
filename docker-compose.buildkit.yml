@@ -1,0 +1,59 @@
+# Docker Compose override for BuildKit development
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.buildkit.yml up --build
+
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      # Enable BuildKit features
+      cache_from:
+        - fastapi-backend:buildcache
+      # Build arguments for BuildKit
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    environment:
+      - DOCKER_BUILDKIT=1
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # Enable BuildKit features  
+      cache_from:
+        - react-frontend:buildcache
+      # Build arguments for BuildKit
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+        NODE_ENV: ${NODE_ENV:-development}
+    environment:
+      - DOCKER_BUILDKIT=1
+
+  # Development frontend with hot reload
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+      cache_from:
+        - react-frontend:devcache
+        - react-frontend:buildcache
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/package-lock.json:/app/package-lock.json
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - /app/node_modules  # Anonymous volume for node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
+      - VITE_HMR_PORT=3000
+      - CHOKIDAR_USEPOLLING=true
+      - DOCKER_BUILDKIT=1
+    depends_on:
+      - backend

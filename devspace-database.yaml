@@ -1,0 +1,92 @@
+version: v1beta11
+name: fullstack-database
+
+# Variables for customization
+vars:
+- name: POSTGRES_PASSWORD
+  question: What should be the postgres password?
+  default: changethis
+- name: POSTGRES_USER
+  question: What should be the postgres user?
+  default: postgres
+- name: POSTGRES_DB
+  question: What should be the postgres database name?
+  default: app
+
+# Deploy database only
+deployments:
+- name: database-dev
+  kubectl:
+    manifests:
+      - k8s/base/shared/configmap.yaml
+      - k8s/base/shared/secret.yaml
+      - k8s/base/database/
+
+# Development configuration for database
+dev:
+  database:
+    imageSelector: postgres:17
+    container: postgres
+    
+    # Port forwarding for direct database access
+    ports:
+    - port: "5432:5432"
+
+    # Terminal access for database administration
+    terminal:
+      enabled: true
+
+    # Environment variables for development
+    env:
+    - name: POSTGRES_PASSWORD
+      value: ${POSTGRES_PASSWORD}
+    - name: POSTGRES_USER
+      value: ${POSTGRES_USER}
+    - name: POSTGRES_DB
+      value: ${POSTGRES_DB}
+
+  # Optional: Add Adminer for database management
+  adminer:
+    imageSelector: adminer
+    ports:
+    - port: "8080:8080"
+    disabled: true
+
+# Profiles
+profiles:
+- name: with-adminer
+  description: Enable Adminer web interface for database management
+  patches:
+  - op: replace
+    path: dev.adminer.disabled
+    value: false
+  - op: add
+    path: deployments[0].kubectl.manifests
+    value: k8s/base/database/adminer.yaml
+
+- name: production
+  description: Production database configuration
+  patches:
+  - op: replace
+    path: dev.database.env[0].value
+    value: "${POSTGRES_PASSWORD}"
+
+# Hooks
+hooks:
+- events: ["after:deploy"]
+  command: |
+    echo "Waiting for database to be ready..."
+    kubectl wait --for=condition=ready pod -l app=postgres-db --timeout=300s || true
+    echo ""
+    echo "🗄️ Database is ready!"
+    echo ""
+    echo "Connection details:"
+    echo "  Host: localhost"  
+    echo "  Port: 5432"
+    echo "  Database: ${POSTGRES_DB}"
+    echo "  User: ${POSTGRES_USER}"
+    echo "  Password: ${POSTGRES_PASSWORD}"
+    echo ""
+    echo "Connect via:"
+    echo "  psql -h localhost -p 5432 -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+    echo "  or use Adminer at http://localhost:8080 (if enabled)"

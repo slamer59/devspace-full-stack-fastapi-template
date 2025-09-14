@@ -1,0 +1,42 @@
+version: v1beta9
+name: fullstack-backend
+
+vars:
+- name: DOMAIN
+  default: localhost
+- name: POSTGRES_PASSWORD
+  default: changethis
+
+images:
+  backend:
+    image: fastapi-backend
+    dockerfile: ./backend/Dockerfile
+    context: ./backend
+
+deployments:
+- name: backend-dev
+  kubectl:
+    manifests:
+      - k8s/base/shared/
+      - k8s/base/database/
+      - k8s/base/backend/
+
+dev:
+  sync:
+  - imageName: backend
+    localSubPath: ./backend/app
+    containerPath: /app/app
+    excludePaths:
+    - __pycache__/
+    - "*.pyc"
+    
+  ports:
+  - imageName: backend
+    forward:
+    - port: 8000
+      remotePort: 8000
+  - labelSelector:
+      app: postgres-db
+    forward:
+    - port: 5432
+      remotePort: 5432

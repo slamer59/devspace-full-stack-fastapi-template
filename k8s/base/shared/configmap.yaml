@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    app: fullstack-app
+data:
+  # Database configuration
+  POSTGRES_DB: "app"
+  POSTGRES_USER: "postgres"
+  POSTGRES_PORT: "5432"
+  
+  # Application configuration
+  PROJECT_NAME: "Full Stack FastAPI App"
+  DOMAIN: "localhost"
+  FRONTEND_HOST: "http://frontend-service"
+  ENVIRONMENT: "local"
+  BACKEND_CORS_ORIGINS: '["http://localhost:3000", "https://localhost:3000", "http://localhost", "https://localhost"]'
+  FIRST_SUPERUSER: "admin@example.com"
+  
+  # Optional SMTP configuration (can be overridden)
+  SMTP_HOST: ""
+  SMTP_USER: ""
+  EMAILS_FROM_EMAIL: ""
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-production
+  labels:
+    app: fullstack-app
+    environment: production
+data:
+  # Database configuration
+  POSTGRES_DB: "app"
+  POSTGRES_USER: "postgres"
+  POSTGRES_PORT: "5432"
+  
+  # Application configuration - UPDATE THESE VALUES FOR PRODUCTION
+  DOMAIN: "yourdomain.com"
+  FRONTEND_HOST: "https://dashboard.yourdomain.com"
+  ENVIRONMENT: "production"
+  BACKEND_CORS_ORIGINS: '["https://dashboard.yourdomain.com", "https://yourdomain.com"]'
+  FIRST_SUPERUSER: "admin@yourdomain.com"
+  
+  # Optional SMTP configuration
+  SMTP_HOST: "smtp.yourdomain.com"
+  SMTP_USER: "noreply@yourdomain.com"
+  EMAILS_FROM_EMAIL: "noreply@yourdomain.com"

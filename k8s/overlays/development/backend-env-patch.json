@@ -1,0 +1,26 @@
+[
+  {
+    "op": "replace",
+    "path": "/spec/template/spec/containers/0/env",
+    "value": [
+      {"name": "POSTGRES_SERVER", "value": "postgres-service.devspace-test.svc.cluster.local"},
+      {"name": "POSTGRES_PORT", "value": "5432"},
+      {"name": "POSTGRES_DB", "value": "app"},
+      {"name": "POSTGRES_USER", "value": "postgres"},
+      {"name": "POSTGRES_PASSWORD", "value": "changethis"},
+      {"name": "SECRET_KEY", "value": "dev-secret-key-change-in-production"},
+      {"name": "FIRST_SUPERUSER", "value": "admin@example.com"},
+      {"name": "FIRST_SUPERUSER_PASSWORD", "value": "changethis"},
+      {"name": "DOMAIN", "value": "localhost"},
+      {"name": "FRONTEND_HOST", "value": "http://localhost:3000"},
+      {"name": "ENVIRONMENT", "value": "local"},
+      {"name": "PROJECT_NAME", "value": "Full Stack FastAPI App"},
+      {"name": "BACKEND_CORS_ORIGINS", "value": "[\"http://localhost:3000\", \"https://localhost:3000\", \"http://localhost\", \"https://localhost\"]"},
+      {"name": "SMTP_HOST", "value": ""},
+      {"name": "SMTP_USER", "value": ""},
+      {"name": "SMTP_PASSWORD", "value": ""},
+      {"name": "EMAILS_FROM_EMAIL", "value": ""},
+      {"name": "SENTRY_DSN", "value": ""}
+    ]
+  }
+]

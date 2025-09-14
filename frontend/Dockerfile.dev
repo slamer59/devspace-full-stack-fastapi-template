@@ -1,0 +1,25 @@
+# Development Dockerfile for React frontend with hot reload
+FROM node:24
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json /app/
+
+# Install dependencies with BuildKit cache mount
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --cache /root/.npm --prefer-offline
+
+# Copy source code (will be overridden by DevSpace sync)
+COPY ./ /app/
+
+# Expose port for Vite dev server
+EXPOSE 3000
+
+# Set development environment
+ENV NODE_ENV=development
+ENV VITE_HMR_PORT=3000
+ENV VITE_HOST=0.0.0.0
+
+# Start development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
