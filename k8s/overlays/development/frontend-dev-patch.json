@@ -1,0 +1,27 @@
+[
+  {
+    "op": "replace",
+    "path": "/spec/template/spec/containers/0/ports/0/containerPort",
+    "value": 5173
+  },
+  {
+    "op": "replace",
+    "path": "/spec/template/spec/containers/0/livenessProbe/httpGet/port",
+    "value": 5173
+  },
+  {
+    "op": "replace",
+    "path": "/spec/template/spec/containers/0/readinessProbe/httpGet/port", 
+    "value": 5173
+  },
+  {
+    "op": "replace",
+    "path": "/spec/template/spec/containers/0/resources/limits/memory",
+    "value": "1Gi"
+  },
+  {
+    "op": "replace",
+    "path": "/spec/template/spec/containers/0/resources/requests/memory",
+    "value": "512Mi"
+  }
+]

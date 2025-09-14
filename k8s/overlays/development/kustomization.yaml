@@ -19,6 +19,12 @@ patchesJson6902:
       kind: Deployment
       name: fastapi-backend
     path: backend-env-patch.json
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: react-frontend
+    path: frontend-dev-patch.json
 
 # Images that will be managed by DevSpace
 images:

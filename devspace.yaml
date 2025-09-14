@@ -16,7 +16,7 @@ images:
     buildKit: {}
   frontend:
     image: react-frontend
-    dockerfile: ./frontend/Dockerfile
+    dockerfile: ./frontend/Dockerfile.dev
     context: ./frontend
     rebuildStrategy: ignoreContextChanges
     buildKit: {}
@@ -31,9 +31,6 @@ deployments:
 dev:
   backend:
     imageSelector: fastapi-backend
-    terminal:
-      command: fastapi dev --host 0.0.0.0 --port 8000 app/main.py
-      workDir: /app
     sync:
       - path: ./backend/app:/app/app
         excludePaths:
@@ -47,7 +44,7 @@ dev:
     sync:
       - path: ./frontend/src:/app/src
     ports:
-      - port: "3001:80"
+      - port: "3001:5173"
 
   database:
     labelSelector:
