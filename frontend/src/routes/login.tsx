@@ -102,7 +102,7 @@ function Login() {
         Log In
       </Button>
       <Text>
-        Don't have an account???{" "}
+        Don't have an account?{" "}
         <RouterLink to="/signup" className="main-link">
           Sign Up
         </RouterLink>

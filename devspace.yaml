@@ -24,9 +24,11 @@ images:
 deployments:
   fullstack:
     kubectl:
-      kustomize: true
       manifests:
-        - k8s/overlays/development/
+        - k8s/base/shared/
+        - k8s/base/backend/
+        - k8s/base/frontend/
+        - k8s/base/database/
 
 dev:
   backend:
@@ -44,11 +46,11 @@ dev:
     sync:
       - path: ./frontend/src:/app/src
     ports:
-      - port: "3001:5173"
+      - port: "3000:5173"
 
   database:
     labelSelector:
-      app: fullstack-app
+      app: postgres-db
     ports:
       - port: "5432"
 

@@ -38,5 +38,5 @@ RUN chmod +x /app/devspace_start.sh
 
 # Sync the project
 RUN uv sync
-
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+# CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+CMD ["fastapi", "dev", "--host", "0.0.0.0", "app/main.py"]
